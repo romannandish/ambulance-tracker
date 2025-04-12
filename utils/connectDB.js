@@ -5,7 +5,7 @@ const connectDB = async () => {
 
   try {
     // Use the local MongoDB connection string
-    await mongoose.connect("mongodb://localhost:27017/tracker", {
+    await mongoose.connect("mongodb://localhost:27017/track", {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
