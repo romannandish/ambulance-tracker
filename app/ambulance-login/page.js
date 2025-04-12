@@ -1,59 +1,153 @@
-// app/ambulance-login/page.jsx
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AmbulanceLogin() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [isLogin, setIsLogin] = useState(true);
+  const [formData, setFormData] = useState({
+    name: "",
+    dob: "",
+    number: "",
+    vehicleNumber: "",
+    hospitalName: "",
+    driverId: "",
+    email: "",
+    password: "",
+  });
+
+  const router = useRouter();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData); // Replace this with backend API call later
+
+    try {
+      const res = await fetch(`/api/ambulance/${isLogin ? "login" : "register"}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(data.message);
+        router.push("/start-trip");
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-[80vh] bg-gray-100 px-4">
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">Ambulance Driver Login</h2>
+        <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">
+          {isLogin ? "Ambulance Driver Login" : "Register Ambulance Driver"}
+        </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="block mb-1 text-gray-700 font-semibold">Email Address</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="driver@example.com"
-            />
-          </div>
+          {!isLogin && (
+            <>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                placeholder="Full Name"
+                className="input"
+              />
+              <input
+                type="date"
+                name="dob"
+                value={formData.dob}
+                onChange={handleChange}
+                required
+                className="input"
+              />
+              <input
+                type="text"
+                name="number"
+                value={formData.number}
+                onChange={handleChange}
+                required
+                placeholder="Phone Number"
+                className="input"
+              />
+              <input
+                type="text"
+                name="vehicleNumber"
+                value={formData.vehicleNumber}
+                onChange={handleChange}
+                required
+                placeholder="Vehicle Number"
+                className="input"
+              />
+              <input
+                type="text"
+                name="hospitalName"
+                value={formData.hospitalName}
+                onChange={handleChange}
+                required
+                placeholder="Hospital Name"
+                className="input"
+              />
+              <input
+                type="text"
+                name="driverId"
+                value={formData.driverId}
+                onChange={handleChange}
+                required
+                placeholder="Driver ID"
+                className="input"
+              />
+            </>
+          )}
 
-          <div>
-            <label className="block mb-1 text-gray-700 font-semibold">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Enter your password"
-            />
-          </div>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            placeholder="Email Address"
+            className="input"
+          />
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            placeholder="Password"
+            className="input"
+          />
 
           <button
             type="submit"
             className="mt-4 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
           >
-            Login
+            {isLogin ? "Login" : "Register"}
           </button>
         </form>
+
+        <p className="text-center text-gray-600 mt-4">
+          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+          <button
+            onClick={() => setIsLogin(!isLogin)}
+            className="text-blue-600 font-bold"
+          >
+            {isLogin ? "Register" : "Login"}
+          </button>
+        </p>
       </div>
     </div>
   );
